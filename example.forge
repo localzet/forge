@@ -1,0 +1,4 @@
+function main() {
+    let x: int = 10;
+    print(x);
+}
