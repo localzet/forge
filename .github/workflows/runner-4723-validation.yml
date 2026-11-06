@@ -50,10 +50,10 @@ jobs:
             --logger 'console;verbosity=normal' \
             --verbosity minimal
 
-      - name: Run complete Runner xUnit test suite
+      - name: Assemble official development layout and run complete test suite
         shell: bash
         run: |
           set -euo pipefail
-          dotnet test runner/src/Test/Test.csproj --no-restore \
-            --logger 'console;verbosity=minimal' \
-            --verbosity minimal
+          cd runner/src
+          ./dev.sh layout
+          ./dev.sh test
