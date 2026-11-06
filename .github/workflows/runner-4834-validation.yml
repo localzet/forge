@@ -1,0 +1,55 @@
+name: Isolated Runner surrogate-pair fix validation
+
+on:
+  push:
+    branches:
+      - ci/runner-4834-validation
+    paths:
+      - .github/workflows/runner-4834-validation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      DOTNET_NOLOGO: "1"
+    steps:
+      - name: Checkout temporary CI branch
+        uses: actions/checkout@v4
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Fetch proposed Runner fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init runner
+          git -C runner remote add origin https://github.com/localzet/runner.git
+          git -C runner fetch --depth=1 origin 7acfc59af5967cb1cdf8bd706196f916c319700f
+          git -C runner checkout --detach FETCH_HEAD
+          git -C runner diff --check HEAD^ HEAD || git -C runner diff --check HEAD
+          git -C runner log -1 --format='%H %s'
+
+      - name: Build and run surrogate-pair regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet test runner/src/Test/Test.csproj \
+            --filter 'FullyQualifiedName~AddIssue_TruncationDoesNotSplitSurrogatePair|FullyQualifiedName~PublishStepTelemetry_TruncationDoesNotSplitSurrogatePair' \
+            --logger 'console;verbosity=normal' \
+            --verbosity minimal
+
+      - name: Official Runner layout and full test suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd runner/src
+          ./dev.sh layout
+          ./dev.sh test
