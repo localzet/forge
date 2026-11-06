@@ -49,3 +49,11 @@ jobs:
             --filter 'FullyQualifiedName~WorkflowPermissionsL0' \
             --logger 'console;verbosity=normal' \
             --verbosity minimal
+
+      - name: Run complete Runner xUnit test suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet test runner/src/Test/Test.csproj --no-restore \
+            --logger 'console;verbosity=minimal' \
+            --verbosity minimal
