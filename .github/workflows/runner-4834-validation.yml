@@ -32,7 +32,7 @@ jobs:
           set -euo pipefail
           git init runner
           git -C runner remote add origin https://github.com/localzet/runner.git
-          git -C runner fetch --depth=1 origin 7acfc59af5967cb1cdf8bd706196f916c319700f
+          git -C runner fetch --depth=1 origin 2164caf95cd4c65923b1500c7c84a025684feae1
           git -C runner checkout --detach FETCH_HEAD
           git -C runner diff --check HEAD^ HEAD || git -C runner diff --check HEAD
           git -C runner log -1 --format='%H %s'
